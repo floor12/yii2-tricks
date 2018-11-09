@@ -39,6 +39,62 @@
 - dropDownData() - для вывода результатов запроса в виде массива для виджетов форм
 - и тому подобные конструкции, которые позволяют избегать в коде копипасты различных условий Model::find()->andWhere()...
 
+Вот пример простого варианта ActiveQuery
+```php
+class CategoryQuery extends \yii\db\ActiveQuery
+{
+
+
+    /** 
+     * @return CategoryQuery
+     */
+    public function available()
+    {
+        return $this->andWhere(['!=', 'available', 0]);
+    }
+
+    /**
+     * @return CategoryQuery
+     */
+    public function active()
+    {
+        return $this->andWhere(['status' => Status::ACTIVE]);
+    }
+
+    /**
+     * @return array
+     */
+    public function dropbdown()
+    {
+        return $this
+            ->select('title')
+            ->indexBy('id')
+            ->orderBy('title')
+            ->column();
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return \floor12\ecommerce\models\Category[]|array
+     */
+    public function all($db = null)
+    {
+        return parent::all($db);
+    }
+
+    /**
+     * {@inheritdoc}
+     * @return \floor12\ecommerce\models\Category|array|null
+     */
+    public function one($db = null)
+    {
+        return parent::one($db);
+    }
+}
+
+
+```
+
 Классов **Enum**  для хранения различных простых вариантов статусов, типов данных и прочих. Плюсом тут является то, что BaseEnum уже из коробки работает с интернационализацией;
 
 **Классов фильтров**. Их может быть много, и для фронта и для бекенда - разные. Могут быть и одинаковые, где ветвление на основе прав доступа происходит внутри. Обычно эти классы я не наследую от AR модели, а наследую от base/Model, отдельно перечисляя все поля-признаки, по которым необходимо делать поиск;
